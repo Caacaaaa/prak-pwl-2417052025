@@ -1,30 +1,32 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+namespace App\Models;
 
-return new class extends Migration
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
+class UserModel extends Model
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
-        Schema::create('user', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama');
-            $table->string('nim');
-            $table->foreignId('kelas_id')->constrained();
-            $table->timestamps();
-        });
-    }
+    use HasFactory, HasUuids;
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    protected $table = 'user';
+
+    protected $keyType = 'string';
+
+    public $incrementing = false;
+
+    protected $guarded = ['id'];
+
+    public function getUser()
     {
-        Schema::dropIfExists('user');
+        return $this->join(
+            'kelas',
+            'kelas.id',
+            '=',
+            'user.kelas_id'
+        )
+        ->select('user.*', 'kelas.nama_kelas as nama_kelas')
+        ->get();
     }
-};
+}
